@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type='text/javascript' src='myModule2.js'></script>
+
+
+</head>
+
+<body>
+    <input type='text' placeholder="id">
+    <button id='btn'>计算</button>
+
+
+    <script>
+        // 要实现功能： input  输入框里是位数id，点击计算按钮，返回 第id 为的斐波那契数列数值：
+        function fibonacci(id) {
+            // 斐波那契数列： 1,1,2，3,5,8,13,21.。。。(每一位都是前两位的和) 当 n >2 时， f(n)=f(n-1)+f(n-2); 
+            return id <= 2 ? 1 : (fibonacci(id - 1) + fibonacci(id - 2)) // 这其实就是递归调用（函数内部，调用自己）
+        }
+        //console.log(fibonacci(8)); // 输出：  21
+        // 第一步： 得到 Input 里面的 id 值： 
+        var input = document.getElementsByTagName('input')[0]
+
+        // 给按钮计算加绑定函数： 
+        var btn = document.getElementById('btn')
+        btn.onclick = function(id) {
+            var id = input.value
+                // 将 主线程的 id 参数传递给分线程： 
+                // 创建一个Worker构造函数的对象：  并向它传递将在新线程中执行的脚本的URL
+            var worker = new Worker('worker.js')
+                // 向分线程发送数据消息（此处是 id 数值）： 
+            worker.postMessage(id);
+            console.log('主线程向分线程发送数据： ' + id)
+                // 主线程除了发送消息还要收集分线程执行完毕的返回结果： 
+            worker.onmessage = function(event) {
+                    console.log('主线程接收分线程执行的返回数据： ' + event.data)
+                } // 这个函数也可以写在前面，是异步执行的，回调代码
+            console.log(this) // 这里的 this 是window
+
+        }
+    </script>
+
+
+</body>
+
+</html>
